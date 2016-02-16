@@ -1,3 +1,4 @@
-void main() {
+void hello();
+int main() {
 	hello();
 }
