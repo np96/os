@@ -4,7 +4,7 @@ int main() {
     
     int cct = 1;
     while (1) {
-        char data[2048];
+        char data[1024];
         int count = 0;
         int size = 1024;
         while (size > 0 && cct != 0) {
