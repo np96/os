@@ -4,9 +4,10 @@ int main() {
     
     int cct = 1;
     while (1) {
-        char data[1024];
+        char data[2048];
         int count = 0;
         int size = 1024;
+	fflush(stdout);
         while (size > 0 && cct != 0) {
             fflush(stdout);
             void* tptr = data;
