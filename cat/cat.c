@@ -1,17 +1,17 @@
-#include <stdio.h>
+#include <fcntl.h>
 
-int main() {
-    
+
+int main(int argc, const char ** argv) {
+    int fd = 0;
+    if (argc > 1) fd = open(argv[1], O_RDONLY);  
     int cct = 1;
     while (1) {
-        char data[2048];
+        char data[1024];
         int count = 0;
         int size = 1024;
-	fflush(stdout);
         while (size > 0 && cct != 0) {
-            fflush(stdout);
             void* tptr = data;
-            int received = read(0,tptr,size);
+            int received = read(fd,tptr,size);
             if (received == -1 ) return 1;
             if (0 == received) cct = 0;
             tptr += received;
@@ -29,8 +29,9 @@ int main() {
             tptr += sent;
             rec_count +=sent;
             count -= sent;
-        }
+        } 
     }
+    if (fd != 0) close(fd);
     return 0;
     
 }
