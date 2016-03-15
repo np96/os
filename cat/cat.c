@@ -8,10 +8,11 @@ int main(int argc, const char ** argv) {
     char data[size];
     int count;
     while ((count = read(fd,data,size)) > 0) { 
-        while (count > 0) {
-	    int received = write(1,data+size-count,count);
+	int c = 0; 
+	while (count > c) {
+	    int received = write(1,data+c,count-c);
             if (received == -1) return 1;  
-            count -= received;
+            c += received;
         } 
     }
     if (fd != 0) close(fd);
