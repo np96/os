@@ -10,6 +10,5 @@ for i in $1/*; do
 done
 }
 directory=${1-`pwd`}
-echo $directory
 linkcheck $directory
 rm -f tempfile
