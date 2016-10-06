@@ -2,17 +2,17 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdbool.h>
-bool caught;
+int caught = 0;
 
+int sigpid;
+int signum;
+bool temp;
 void handler(int signo, siginfo_t *info, ucontext_t *uap) {
-    if (signo == SIGUSR1) {
-        printf("SIGUSR1 from %d\n", info->si_pid);
-        caught = 1;
-    }
-    if (signo == SIGUSR2) {
-        printf("SIGUSR2 from %d\n", info->si_pid);
-        caught = 1;
-    }
+    if (temp == 1) return;
+    temp = 1;
+    caught = 1;
+    signum = info->si_signo;
+    sigpid = info->si_pid;
 }
 
 int main() {
@@ -21,6 +21,9 @@ int main() {
     sleep(10);
     if (!caught) {
         printf("No signals were caught\n");
+    } else {
+        printf("SIGUSR%d from %d", (signum%2) + 1, sigpid);
+        
     }
     return 0;
 

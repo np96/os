@@ -13,13 +13,14 @@
 #include <sys/wait.h>
 
 std::deque<pid_t> pids;
-int current = -1;
 
 void handler(int signo) {
     if (signo == SIGINT) {
-        if (current != -1) {
-            kill(pids[current], signo);
-        }
+            for (auto i: pids) {
+                kill(i, signo);
+                std::string wr = "killed " + std::to_string(signo);
+                write(1,wr.c_str(),wr.size());
+            }
     }
     
 }
@@ -54,6 +55,9 @@ std::string readline() {
 void proceedCommand(std::string tokens) {
     std::deque<std::string> commandList(0);
     commandList = split(tokens, ' ', commandList);
+    while (commandList.front().size() == 0 || commandList.front() == " ") {
+        commandList.pop_front();
+    }
     const int len = commandList.size() + 1;
     char *arguments[len];
     for (int i = 0; i < commandList.size(); ++i) {
@@ -79,27 +83,28 @@ int main(int argc, char **argv) {
         for (int i = 0; i < tokens.size(); ++i) {
             int id;
             if ((id = fork()) > 0) {
-                current = id;
                 pids[i] = id;
             } else {
                 if (i != 0) {
-                    dup2(ffd[i - 1][0], STDIN_FILENO);
-                    close(ffd[i - 1][1]);
+                    //dup2(ffd[i - 1][1], ffd[i][0]);
+                    dup2(ffd[i - 1][1], STDIN_FILENO);
+                    close(ffd[i - 1][0]);
                 }
                 if (i != tokens.size() - 1) {
                     dup2(ffd[i][1], STDOUT_FILENO);
                 }
-                close(ffd[i][0]);
                 proceedCommand(tokens[i]);
+                close(ffd[i][1]);
+                close(ffd[i][0]);
             }
             if (id < 0) return 0;
+        }
+        for (int i = 0, j; i < tokens.size(); ++i) {
+            waitpid(pids[i], &j, 0);
         }
         for (int i = 0; i < tokens.size() - 1; ++i) {
             close(ffd[i][0]);
             close(ffd[i][1]);
-        }
-        for (int i = 0, j; i < tokens.size(); ++i) {
-            waitpid(pids[i], &j, NULL);
         }
         pids.clear();
     }

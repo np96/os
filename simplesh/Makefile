@@ -1,5 +1,5 @@
 all: simplesh
-simplesh : simplesh.c
+simplesh : simplesh.cpp
 	g++ -o $@ $<
 clean:
 	rm -f simplesh
